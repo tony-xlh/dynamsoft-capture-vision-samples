@@ -9,6 +9,14 @@
       max-width: 100%;
       width: 300px;
     }
+
+    .results {
+      display: flex;
+    }
+
+    #captureResults img{
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -28,8 +36,9 @@
     <button id="loadFileButton">Load an Image</button>
     <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
     <button id="processButton">Process</button>
-    <div>
+    <div class="results">
       <img id="image"/>
+      <div id="captureResults"></div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/dynamsoft-core@3.0.33/dist/core.js"></script>
@@ -73,7 +82,33 @@
       }
       const results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
       console.log(results);
+      displayResults(results.items);
     }
+
+    function displayResults(results){
+      let ol = document.createElement("ol");
+      for (let index = 0; index < results.length; index++) {
+        const result = results[index];
+        let item = document.createElement("li");
+        if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE) {
+          let p = document.createElement("p");
+          p.innerText = result.formatString + ": " + result.text;
+          item.appendChild(p);
+        }else if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_NORMALIZED_IMAGE) {
+          let img = document.createElement("img");
+          img.src = result.toCanvas().toDataURL();
+          item.appendChild(img);
+        }else if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_TEXT_LINE) {
+          let p = document.createElement("p");
+          p.innerText = result.text;
+          item.appendChild(p);
+        }
+        console.log(item);
+        ol.appendChild(item);
+      }
+      document.getElementById("captureResults").innerHTML = ol.outerHTML;
+    }
+
 
     function loadImageFromFile(){
       let fileInput = document.getElementById("file");
