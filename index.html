@@ -65,7 +65,7 @@
       processButton.disabled = true;
       processButton.innerText = "Loading...";
       Dynamsoft.License.LicenseManager.initLicense(
-        "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9"
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="
       );
       await Dynamsoft.Core.CoreModule.loadWasm(["cvr", "dbr", "dlr", "ddn"]);
       router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
