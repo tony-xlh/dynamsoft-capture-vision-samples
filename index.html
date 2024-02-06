@@ -27,6 +27,7 @@
     </label>
     <button id="loadFileButton">Load an Image</button>
     <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
+    <button id="processButton">Process</button>
     <div>
       <img id="image"/>
     </div>
@@ -38,9 +39,39 @@
   <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@3.0.30/dist/dlr.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-router@2.0.32/dist/cvr.js"></script>
   <script>
+    let router;
+
     document.getElementById("loadFileButton").addEventListener("click",function(){
       document.getElementById("file").click();
     });
+    document.getElementById("processButton").addEventListener("click",function(){
+      process();
+    });
+    
+    init();
+
+    async function init(){
+      let processButton = document.getElementById("processButton");
+      processButton.disabled = true;
+      processButton.innerText = "Loading...";
+      Dynamsoft.License.LicenseManager.initLicense(
+        "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9"
+      );
+      await Dynamsoft.Core.CoreModule.loadWasm(["cvr", "dbr", "dlr", "ddn"]);
+      router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+      processButton.innerText = "Process";
+      processButton.disabled = false;
+    }
+
+    async function process(){
+      if (!router) {
+        alert("Capture Vision not ready.");
+        return;
+      }
+      const results = await router.capture(document.getElementById("image"),"");
+      console.log(results);
+    }
+
     function loadImageFromFile(){
       let fileInput = document.getElementById("file");
       let files = fileInput.files;
