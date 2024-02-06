@@ -1,0 +1,119 @@
+{
+  "CaptureVisionTemplates": [
+    {
+      "Name": "ScanDocumentAndReadBarcode",
+      "ImageROIProcessingNameArray": [
+        "roi-detect-and-normalize-document",
+        "roi-read-barcodes"
+      ],
+      "OutputOriginalImage": 1,
+      "Timeout": 10000
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "roi-read-barcodes",
+      "TaskSettingNameArray": ["task-read-barcodes"]
+    },
+    {
+      "Name": "roi-detect-and-normalize-document",
+      "TaskSettingNameArray": ["task-detect-and-normalize-document"]
+    }
+  ],
+  "BarcodeReaderTaskSettingOptions": [
+    {
+      "Name": "task-read-barcodes",
+      "LocalizationModes": [
+        {
+          "Mode": "LM_SCAN_DIRECTLY",
+          "ScanDirection": 2
+        },
+        {
+          "Mode": "LM_CONNECTED_BLOCKS"
+        }
+      ],
+      "DeblurModes": [
+        {
+          "Mode": "DM_BASED_ON_LOC_BIN"
+        },
+        {
+          "Mode": "DM_THRESHOLD_BINARIZATION"
+        }
+      ],
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip-read-barcodes"
+        },
+        {
+          "Section": "ST_BARCODE_LOCALIZATION",
+          "ImageParameterName": "ip-read-barcodes"
+        },
+        {
+          "Section": "ST_BARCODE_DECODING",
+          "ImageParameterName": "ip-read-barcodes"
+        }
+      ]
+    }
+  ],
+  "DocumentNormalizerTaskSettingOptions": [
+    {
+      "Name": "task-detect-and-normalize-document",
+      "SectionImageParameterArray": [
+        {
+          "Section": "ST_REGION_PREDETECTION",
+          "ImageParameterName": "ip-detect-and-normalize"
+        },
+        {
+          "Section": "ST_DOCUMENT_DETECTION",
+          "ImageParameterName": "ip-detect-and-normalize"
+        },
+        {
+          "Section": "ST_DOCUMENT_NORMALIZATION",
+          "ImageParameterName": "ip-detect-and-normalize"
+        }
+      ]
+    }
+  ],
+  "ImageParameterOptions": [
+    {
+      "Name": "ip-read-barcodes",
+      "TextDetectionMode": {
+        "Mode": "TTDM_LINE",
+        "Direction": "UNKNOWN",
+        "Sensitivity": 3
+      },
+      "IfEraseTextZone": 1,
+      "BinarizationModes": [
+        {
+          "Mode": "BM_LOCAL_BLOCK",
+          "BlockSizeX": 71,
+          "BlockSizeY": 71,
+          "EnableFillBinaryVacancy": 0
+        }
+      ],
+      "GrayscaleTransformationModes": [
+        {
+          "Mode": "GTM_ORIGINAL"
+        }
+      ],
+      "ScaleDownThreshold": 2300
+    },
+    {
+      "Name": "ip-detect-and-normalize",
+      "BinarizationModes": [
+        {
+          "Mode": "BM_LOCAL_BLOCK",
+          "BlockSizeX": 0,
+          "BlockSizeY": 0,
+          "EnableFillBinaryVacancy": 0
+        }
+      ],
+      "TextDetectionMode": {
+        "Mode": "TTDM_WORD",
+        "Direction": "HORIZONTAL",
+        "Sensitivity": 7
+      }
+    }
+  ]
+}

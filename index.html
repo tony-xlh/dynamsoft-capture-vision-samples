@@ -59,6 +59,9 @@
       );
       await Dynamsoft.Core.CoreModule.loadWasm(["cvr", "dbr", "dlr", "ddn"]);
       router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+      let response = await fetch("/template.json");
+      let settings = await response.text();
+      await router.initSettings(settings);
       processButton.innerText = "Process";
       processButton.disabled = false;
     }
@@ -68,7 +71,7 @@
         alert("Capture Vision not ready.");
         return;
       }
-      const results = await router.capture(document.getElementById("image"),"");
+      const results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
       console.log(results);
     }
 

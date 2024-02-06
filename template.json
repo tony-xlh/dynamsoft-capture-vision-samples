@@ -1,0 +1,30 @@
+{
+  "CaptureVisionTemplates": [
+    {
+      "Name": "ScanDocumentAndReadBarcode",
+      "ImageROIProcessingNameArray": [
+        "roi-detect-and-normalize-document","roi-read-barcodes"
+      ]
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "roi-read-barcodes",
+      "TaskSettingNameArray": ["task-read-barcodes"]
+    },
+    {
+      "Name": "roi-detect-and-normalize-document",
+      "TaskSettingNameArray": ["task-detect-and-normalize-document"]
+    }
+  ],
+  "BarcodeReaderTaskSettingOptions": [
+    {
+      "Name": "task-read-barcodes"
+    }
+  ],
+  "DocumentNormalizerTaskSettingOptions": [
+    {
+      "Name": "task-detect-and-normalize-document"
+    }
+  ]
+}
