@@ -36,6 +36,7 @@
     <button id="loadFileButton">Load an Image</button>
     <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
     <button id="processButton">Process</button>
+    <span id="status"></span>
     <div class="results">
       <img id="image"/>
       <div id="captureResults"></div>
@@ -80,15 +81,21 @@
         alert("Capture Vision not ready.");
         return;
       }
+      let status = document.getElementById("status");
+      status.innerText = "Processing...";
       let useCaseIndex = document.getElementsByClassName("usecase")[0].selectedIndex;
       let results;
+      let startTime = new Date().getTime();
       if (useCaseIndex === 0) {
         results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
       }else{
         results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadMRZ");
       }
+      let endTime = new Date().getTime();
+      let elapsed = endTime - startTime;
       console.log(results);
       displayResults(results.items);
+      status.innerText = "Done in "+elapsed+"ms";
     }
 
     function displayResults(results){
