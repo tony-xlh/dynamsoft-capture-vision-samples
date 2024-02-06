@@ -10,7 +10,13 @@
   "TargetROIDefOptions": [
     {
       "Name": "roi-read-barcodes",
-      "TaskSettingNameArray": ["task-read-barcodes"]
+      "TaskSettingNameArray": ["task-read-barcodes"],
+      "Location":
+      {
+        "ReferenceObjectFilter" : {
+          "ReferenceTargetROIDefNameArray": ["roi-detect-and-normalize-document"]
+        }
+      }
     },
     {
       "Name": "roi-detect-and-normalize-document",
