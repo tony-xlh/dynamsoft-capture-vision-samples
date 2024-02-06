@@ -69,7 +69,7 @@
       );
       await Dynamsoft.Core.CoreModule.loadWasm(["cvr", "dbr", "dlr", "ddn"]);
       router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
-      let response = await fetch("/template.json");
+      let response = await fetch("./template.json");
       let settings = await response.text();
       await router.initSettings(settings);
       processButton.innerText = "Process";
