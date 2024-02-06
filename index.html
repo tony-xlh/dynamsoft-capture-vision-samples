@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert an Image to Black and White</title>
+  <style>
+    #image {
+      max-width: 100%;
+      width: 300px;
+    }
+
+    .results {
+      display: flex;
+    }
+
+    #captureResults img{
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <h2>Dynamsoft Capture Vision</h2>
+    <label>
+      Use case:
+      <select class="usecase">
+        <option>
+          Document Scanning + Barcode Reading
+        </option>
+        <option>
+          Document Scanning + MRZ Reading
+        </option>
+      </select>
+    </label>
+    <button id="loadFileButton">Load an Image</button>
+    <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
+    <button id="processButton">Process</button>
+    <span id="status"></span>
+    <div class="results">
+      <img id="image"/>
+      <div id="captureResults"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-core@3.0.33/dist/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-license@3.0.40/dist/license.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.0.21/dist/dbr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-normalizer@2.0.21/dist/ddn.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@3.0.30/dist/dlr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-router@2.0.32/dist/cvr.js"></script>
+  <script>
+    let router;
+
+    document.getElementById("loadFileButton").addEventListener("click",function(){
+      document.getElementById("file").click();
+    });
+    document.getElementById("processButton").addEventListener("click",function(){
+      process();
+    });
+    
+    init();
+
+    async function init(){
+      let processButton = document.getElementById("processButton");
+      processButton.disabled = true;
+      processButton.innerText = "Loading...";
+      Dynamsoft.License.LicenseManager.initLicense(
+        "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ=="
+      );
+      await Dynamsoft.Core.CoreModule.loadWasm(["cvr", "dbr", "dlr", "ddn"]);
+      router = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+      let response = await fetch("/template.json");
+      let settings = await response.text();
+      await router.initSettings(settings);
+      processButton.innerText = "Process";
+      processButton.disabled = false;
+    }
+
+    async function process(){
+      if (!router) {
+        alert("Capture Vision not ready.");
+        return;
+      }
+      let status = document.getElementById("status");
+      status.innerText = "Processing...";
+      let useCaseIndex = document.getElementsByClassName("usecase")[0].selectedIndex;
+      let results;
+      let startTime = new Date().getTime();
+      if (useCaseIndex === 0) {
+        results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
+      }else{
+        results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadMRZ");
+      }
+      let endTime = new Date().getTime();
+      let elapsed = endTime - startTime;
+      console.log(results);
+      displayResults(results.items);
+      status.innerText = "Done in "+elapsed+"ms";
+    }
+
+    function displayResults(results){
+      let ol = document.createElement("ol");
+      for (let index = 0; index < results.length; index++) {
+        const result = results[index];
+        let item = document.createElement("li");
+        if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_BARCODE) {
+          let p = document.createElement("p");
+          p.innerText = result.formatString + ": " + result.text;
+          item.appendChild(p);
+        }else if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_NORMALIZED_IMAGE) {
+          let img = document.createElement("img");
+          img.src = result.toCanvas().toDataURL();
+          item.appendChild(img);
+        }else if (result.type == Dynamsoft.Core.EnumCapturedResultItemType.CRIT_TEXT_LINE) {
+          let p = document.createElement("p");
+          p.innerText = result.text;
+          item.appendChild(p);
+        }
+        console.log(item);
+        ol.appendChild(item);
+      }
+      document.getElementById("captureResults").innerHTML = ol.outerHTML;
+    }
+
+
+    function loadImageFromFile(){
+      let fileInput = document.getElementById("file");
+      let files = fileInput.files;
+      if (files.length == 0) {
+        return;
+      }
+      let file = files[0];
+      fileReader = new FileReader();
+      fileReader.onload = function(e){
+        document.getElementById("image").src = e.target.result;
+      };
+      fileReader.onerror = function () {
+        console.warn('oops, something went wrong.');
+      };
+      fileReader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
