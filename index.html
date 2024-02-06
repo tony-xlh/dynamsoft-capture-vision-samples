@@ -80,7 +80,13 @@
         alert("Capture Vision not ready.");
         return;
       }
-      const results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
+      let useCaseIndex = document.getElementsByClassName("usecase")[0].selectedIndex;
+      let results;
+      if (useCaseIndex === 0) {
+        results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadBarcode");
+      }else{
+        results = await router.capture(document.getElementById("image"),"ScanDocumentAndReadMRZ");
+      }
       console.log(results);
       displayResults(results.items);
     }
