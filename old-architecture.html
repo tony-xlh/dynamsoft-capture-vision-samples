@@ -6,8 +6,8 @@
   <title>Dynamsoft Products Demo</title>
   <style>
     #image {
-      max-width: 100%;
       width: 300px;
+      object-fit: contain;
     }
 
     .results {
@@ -38,7 +38,9 @@
     <button id="processButton">Process</button>
     <span id="status"></span>
     <div class="results">
-      <img id="image"/>
+      <div>
+        <img id="image"/>
+      </div>
       <div id="captureResults"></div>
     </div>
   </div>
