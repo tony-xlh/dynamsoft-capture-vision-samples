@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamsoft Products Demo</title>
+  <style>
+    #image {
+      max-width: 100%;
+      width: 300px;
+    }
+
+    .results {
+      display: flex;
+    }
+
+    #captureResults img{
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="home">
+    <h2>Dynamsoft Products Demo</h2>
+    <label>
+      Use case:
+      <select class="usecase">
+        <option>
+          Document Scanning + Barcode Reading
+        </option>
+        <option>
+          Document Scanning + MRZ Reading
+        </option>
+      </select>
+    </label>
+    <button id="loadFileButton">Load an Image</button>
+    <input style="display:none;" type="file" id="file" onchange="loadImageFromFile();" accept=".jpg,.jpeg,.png,.bmp" />
+    <button id="processButton">Process</button>
+    <span id="status"></span>
+    <div class="results">
+      <img id="image"/>
+      <div id="captureResults"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@9.6.33/dist/dbr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-label-recognizer@2.2.31/dist/dlr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-document-normalizer@1.0.12/dist/ddn.js"></script>
+  <script>
+    let documentNormalizer;
+    let barcodeReader;
+    let labelRecognizer;
+
+    document.getElementById("loadFileButton").addEventListener("click",function(){
+      document.getElementById("file").click();
+    });
+    document.getElementById("processButton").addEventListener("click",function(){
+      process();
+    });
+    
+    init();
+
+    async function init(){
+      let processButton = document.getElementById("processButton");
+      processButton.disabled = true;
+      processButton.innerText = "Loading...";
+      const license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==";
+      Dynamsoft.DDN.DocumentNormalizer.license = license;
+      Dynamsoft.DBR.BarcodeReader.license = license;
+      Dynamsoft.DLR.LabelRecognizer.license = license;
+      barcodeReader = await Dynamsoft.DBR.BarcodeReader.createInstance();
+      documentNormalizer = await Dynamsoft.DDN.DocumentNormalizer.createInstance();
+      labelRecognizer = await Dynamsoft.DLR.LabelRecognizer.createInstance();
+      await labelRecognizer.updateRuntimeSettingsFromString("MRZ");
+      processButton.innerText = "Process";
+      processButton.disabled = false;
+    }
+
+    async function process(){
+      let status = document.getElementById("status");
+      status.innerText = "Processing...";
+      let useCaseIndex = document.getElementsByClassName("usecase")[0].selectedIndex;
+      let results;
+      let startTime = new Date().getTime();
+      let img = document.getElementById("image");
+      let quads = await documentNormalizer.detectQuad(img);
+      let normalizedImageResult = await documentNormalizer.normalize(img, {
+        quad: quads[0].location
+      });
+      let normalizedImageAsCanvas = normalizedImageResult.image.toCanvas();
+      let barcodeResults;
+      let textResults;
+      if (useCaseIndex === 0) {
+        barcodeResults = await barcodeReader.decode(normalizedImageAsCanvas);
+      }else{
+        textResults = await labelRecognizer.recognize(normalizedImageAsCanvas);
+      }
+      let endTime = new Date().getTime();
+      let elapsed = endTime - startTime;
+      displayResults(normalizedImageAsCanvas, barcodeResults, textResults);
+      status.innerText = "Done in "+elapsed+"ms";
+    }
+
+    function displayResults(normalizedImageAsCanvas, barcodeResults, textResults){
+      let ol = document.createElement("ol");
+      
+      if (normalizedImageAsCanvas) {
+        let item = document.createElement("li");
+        let img = document.createElement("img");
+        img.src = normalizedImageAsCanvas.toDataURL();
+        item.appendChild(img);
+        ol.appendChild(item);
+      }
+      if (barcodeResults) {
+        for (let index = 0; index < barcodeResults.length; index++) {
+          let item = document.createElement("li");
+          const result = barcodeResults[index];
+          let p = document.createElement("p");
+          p.innerText = result.barcodeFormatString + ": " + result.barcodeText;
+          item.appendChild(p);
+          ol.appendChild(item);
+        }
+      }
+      if (textResults) {
+        for (let i = 0; i < textResults.length; i++) {
+          const result = textResults[i];
+          for (let j = 0; j < result.lineResults.length; j++) {
+            const lineResult = result.lineResults[j];
+            let item = document.createElement("li");
+            let p = document.createElement("p");
+            p.innerText = lineResult.text;
+            item.appendChild(p);
+            ol.appendChild(item);
+          }
+        }
+      }
+      document.getElementById("captureResults").innerHTML = ol.outerHTML;
+    }
+
+
+    function loadImageFromFile(){
+      let fileInput = document.getElementById("file");
+      let files = fileInput.files;
+      if (files.length == 0) {
+        return;
+      }
+      let file = files[0];
+      fileReader = new FileReader();
+      fileReader.onload = function(e){
+        document.getElementById("image").src = e.target.result;
+      };
+      fileReader.onerror = function () {
+        console.warn('oops, something went wrong.');
+      };
+      fileReader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
