@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<head>
+  <title>Smart Note Scanner</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+  <style>
+    #cameraView {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .closeButton {
+      position: fixed;
+      right: 0;
+      top: 0;
+      z-index: 999;
+    }
+  </style>
+</head>
+<html>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@10.2.1000/dist/dbr.bundle.js"></script>
+  <h2>Smart Note Scanner</h2>
+  <button class="startButton" onclick="startScanning()">Start Scanning</button>
+  <div class="scanner" style="display:none;">
+    <button class="closeButton" onclick="stopScanning()">Close</button>
+    <div id="cameraView"></div>
+  </div>
+<script>
+  let cvRouter;
+  let cameraEnhancer;
+  let cameraView;
+  let settings;
+  init();
+  async function init(){
+    document.getElementsByClassName("startButton")[0].innerText = "Initializing...";
+    document.getElementsByClassName("startButton")[0].disabled = true;
+    Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+    Dynamsoft.Core.CoreModule.loadWasm(["dbr"]);
+    cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+
+    cameraView = await Dynamsoft.DCE.CameraView.createInstance();
+    cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
+    document.querySelector("#cameraView").append(cameraView.getUIElement());
+    cvRouter.setInput(cameraEnhancer);
+    let response = await fetch("./cornerQRCodes.json");
+    settings = await response.text();
+    await cvRouter.initSettings(settings);
+    cvRouter.addResultReceiver({ onDecodedBarcodesReceived: (result) => {
+      console.log(result);
+    }});
+    document.getElementsByClassName("startButton")[0].innerText = "Start Scanning";
+    document.getElementsByClassName("startButton")[0].disabled = false;
+  }
+  
+  async function startScanning(){
+    document.getElementsByClassName("scanner")[0].style.display = "block";
+    await cameraEnhancer.open();
+    await cvRouter.startCapturing("ScanCornerQRCodes");
+  }
+
+  async function stopScanning(){
+    document.getElementsByClassName("scanner")[0].style.display = "none";
+    await cvRouter.stopCapturing();
+    await cameraEnhancer.close();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "CaptureVisionTemplates": [
+    {
+      "Name": "ScanCornerQRCodes",
+      "ImageROIProcessingNameArray": [
+        "full-image"
+      ]
+    }
+  ],
+  "TargetROIDefOptions": [
+    {
+      "Name": "full-image",
+      "TaskSettingNameArray": ["task-read-barcodes"],
+      "Location": 
+       {
+           "ReferenceObjectFilter": null,
+           "Offset":
+           {
+               "MeasuredByPercentage": 1,
+               "FirstPoint": [ 0, 0 ],
+               "SecondPoint": [ 100, 0 ],
+               "ThirdPoint": [ 100, 100 ],
+               "FourthPoint": [ 0, 100 ]
+           }
+       }
+    }
+  ],
+  "BarcodeReaderTaskSettingOptions": [
+    {
+      "BarcodeFormatIds": [
+          "BF_QR_CODE"
+      ],
+      "ExpectedBarcodesCount": 4,
+      "Name": "task-read-barcodes"
+    }
+  ]
+}
