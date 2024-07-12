@@ -32,6 +32,7 @@
   let cameraEnhancer;
   let cameraView;
   let settingsStr;
+  let drawingLayer;
   init();
   async function init(){
     document.getElementsByClassName("startButton")[0].innerText = "Initializing...";
@@ -94,6 +95,45 @@
     settings["CaptureVisionTemplates"][0]["ImageROIProcessingNameArray"] = ROINames;
     console.log(settings);
     await cvRouter.initSettings(JSON.stringify(settings));
+    drawRegions(regions);
+  }
+
+  function drawRegions(regions){
+    if (!drawingLayer) {
+      drawingLayer = cameraView.createDrawingLayer();
+    }
+    let drawingItems = new Array(
+      new Dynamsoft.DCE.RectDrawingItem({
+          x: regions[0].left,
+          y: regions[0].top,
+          width: regions[0].width,
+          height: regions[0].height,
+          isMeasuredInPercentage: false
+      }),
+      new Dynamsoft.DCE.RectDrawingItem({
+          x: regions[1].left,
+          y: regions[1].top,
+          width: regions[1].width,
+          height: regions[1].height,
+          isMeasuredInPercentage: false
+      }),
+      new Dynamsoft.DCE.RectDrawingItem({
+          x: regions[2].left,
+          y: regions[2].top,
+          width: regions[2].width,
+          height: regions[2].height,
+          isMeasuredInPercentage: false
+      }),
+      new Dynamsoft.DCE.RectDrawingItem({
+          x: regions[3].left,
+          y: regions[3].top,
+          width: regions[3].width,
+          height: regions[3].height,
+          isMeasuredInPercentage: false
+      })
+    );
+    drawingLayer.clearDrawingItems();
+    drawingLayer.addDrawingItems(drawingItems);
   }
 
   async function startScanning(){
