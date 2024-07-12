@@ -31,7 +31,7 @@
   let cvRouter;
   let cameraEnhancer;
   let cameraView;
-  let settings;
+  let settingsStr;
   init();
   async function init(){
     document.getElementsByClassName("startButton")[0].innerText = "Initializing...";
@@ -45,18 +45,58 @@
     document.querySelector("#cameraView").append(cameraView.getUIElement());
     cvRouter.setInput(cameraEnhancer);
     let response = await fetch("./cornerQRCodes.json");
-    settings = await response.text();
-    await cvRouter.initSettings(settings);
+    settingsStr = await response.text();
+    await cvRouter.initSettings(settingsStr);
     cvRouter.addResultReceiver({ onDecodedBarcodesReceived: (result) => {
       console.log(result);
     }});
     document.getElementsByClassName("startButton")[0].innerText = "Start Scanning";
     document.getElementsByClassName("startButton")[0].disabled = false;
   }
-  
+
+  async function updateTargetROI(){
+    let settings = JSON.parse(settingsStr);
+    let width = cameraEnhancer.getResolution().width;
+    let height = cameraEnhancer.getResolution().height;
+    let ROIs = [];
+    let ROINames = [];
+    let topLeftRegion = {left:0,top:0,width:width*0.3,height:width*0.3};
+    let topRightRegion = {left:width*0.7,top:0,width:width*0.3,height:width*0.3};
+    let bottomRightRegion = {left:width*0.7,top:height - width*0.3,width:width*0.3,height:width*0.3};
+    let bottomLeftRegion = {left:0,top:height - width*0.3,width:width*0.3,height:width*0.3};
+    let regions = [topLeftRegion,topRightRegion,bottomRightRegion,bottomLeftRegion];
+    for (let index = 0; index < regions.length; index++) {
+      const region = regions[index];
+      let roi = {
+        "Name": "ROI_"+index,
+        "TaskSettingNameArray":["task-read-barcodes"],
+        "Location": 
+        {
+          "ReferenceObjectFilter": null,
+          "Offset":
+          {
+            "MeasuredByPercentage": 0,
+            "FirstPoint": [ region.left, region.top ],
+            "SecondPoint": [ region.left+region.width, region.top ],
+            "ThirdPoint": [ region.left+region.width, region.top+region.height ],
+            "FourthPoint": [ region.left, region.top+region.height ]
+          }
+        }
+      }
+      ROIs.push(roi);
+      ROINames.push("ROI_"+index);
+    }
+    console.log(settings);
+    settings["TargetROIDefOptions"] = ROIs;
+    settings["CaptureVisionTemplates"][0]["ImageROIProcessingNameArray"] = ROINames;
+    console.log(settings);
+    await cvRouter.initSettings(JSON.stringify(settings));
+  }
+
   async function startScanning(){
     document.getElementsByClassName("scanner")[0].style.display = "block";
     await cameraEnhancer.open();
+    await updateTargetROI();
     await cvRouter.startCapturing("ScanCornerQRCodes");
   }
 
