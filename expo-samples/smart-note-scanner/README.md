@@ -1,6 +1,12 @@
-# Welcome to your Expo app 👋
+# Expo Smart Note Scanner
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). It runs the web version of smart note scanner in a webview to scan documents by reading the four QR codes around the corners of a document.
+
+
+
+https://github.com/user-attachments/assets/dbf1f079-8410-476e-9e0f-404a9dc991cc
+
+
 
 ## Get started
 
