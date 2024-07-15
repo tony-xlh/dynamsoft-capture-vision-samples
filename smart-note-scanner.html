@@ -41,9 +41,13 @@
   let drawingLayer;
   init();
   async function init(){
+    let license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==";
+    if (getURLParameter("license")) {
+      license = getURLParameter("license");
+    }
     document.getElementsByClassName("startButton")[0].innerText = "Initializing...";
     document.getElementsByClassName("startButton")[0].disabled = true;
-    Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+    Dynamsoft.License.LicenseManager.initLicense(license);
     Dynamsoft.Core.CoreModule.loadWasm(["dbr"]);
     cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
 
@@ -66,6 +70,9 @@
     }});
     document.getElementsByClassName("startButton")[0].innerText = "Start Scanning";
     document.getElementsByClassName("startButton")[0].disabled = false;
+    if (getURLParameter("startScan") == "true") {
+        startScanning();
+    }
   }
 
   async function captureDocument(barcodeResults){
@@ -213,6 +220,17 @@
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView.postMessage("");
     }
+  }
+
+  function getURLParameter(key) {
+    let paramString = window.location.href.split('?')[1];
+    let queryString = new URLSearchParams(paramString);
+    for(let pair of queryString.entries()) {
+      if (pair[0] === key) {
+        return pair[1];
+      }
+    }
+    return undefined;
   }
 </script>
 </body>
