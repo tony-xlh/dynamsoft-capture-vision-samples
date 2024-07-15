@@ -67,7 +67,16 @@
 
     cameraView = await Dynamsoft.DCE.CameraView.createInstance(document.getElementById("cameraView"));
     cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
-    
+    if (getURLParameter("resolution")) {
+      let resolution = getURLParameter("resolution");
+      let resWidth = parseInt(resolution.split("x")[0]);
+      let resHeight = parseInt(resolution.split("x")[1]);
+      try {
+        await cameraEnhancer.setResolution({width:resWidth, height:resHeight});  
+      } catch (error) {
+        console.log(error);
+      }
+    }
     styleID = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
       lineWidth: 4,
       strokeStyle: "red",
