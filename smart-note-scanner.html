@@ -67,7 +67,16 @@
 
     cameraView = await Dynamsoft.DCE.CameraView.createInstance(document.getElementById("cameraView"));
     cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
-    
+    if (getURLParameter("resolution")) {
+      let resolution = getURLParameter("resolution");
+      let resWidth = parseInt(resolution.split("x")[0]);
+      let resHeight = parseInt(resolution.split("x")[1]);
+      try {
+        await cameraEnhancer.setResolution({width:resWidth, height:resHeight});  
+      } catch (error) {
+        console.log(error);
+      }
+    }
     styleID = Dynamsoft.DCE.DrawingStyleManager.createDrawingStyle({
       lineWidth: 4,
       strokeStyle: "red",
@@ -162,13 +171,15 @@
     //A5: 140x210mm
 
     let bigRegionWidth = 0.8*width;
-    let desiredBigRegionHeight = bigRegionWidth/(140/210);
+    let left = Math.floor(0.01*width);
+    let top = Math.floor(0.1*height);
+    let desiredBigRegionHeight = Math.floor(bigRegionWidth/(140/210));
     if (width>height) {
-      desiredBigRegionHeight = bigRegionWidth/(210/140)
+      top = Math.floor(0.01*height);
+      desiredBigRegionHeight = Math.floor(bigRegionWidth/(210/140));
     }
     let regionSize = Math.floor(bigRegionWidth*0.3);
-    let left = Math.floor(0.01*width);
-    let top = Math.floor(0.01*height);
+    
     let topLeftRegion = {left:left,top:top,width:regionSize,height:regionSize};
     let topRightRegion = {left:width - regionSize - left,top:top,width:regionSize,height:regionSize};
     let bottomRightRegion = {left:width - regionSize - left,top: top + desiredBigRegionHeight - regionSize,width:regionSize,height:regionSize};

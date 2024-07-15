@@ -17,7 +17,7 @@ export default function DocumentScanner(props:ScannerProps) {
     })();
   }, []);
   const getURI = () => {
-    let URI = 'https://tony-xlh.github.io/dynamsoft-capture-vision-samples/smart-note-scanner.html?startScan=true';
+    let URI = 'https://tony-xlh.github.io/dynamsoft-capture-vision-samples/smart-note-scanner.html?startScan=true&resolution=1920x1080';
     if (props.license) {
       URI = URI + "&license="+props.license;
     }
