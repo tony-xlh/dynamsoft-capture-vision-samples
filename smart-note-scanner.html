@@ -152,16 +152,62 @@
         bottomLeftResult = result;
       }
     }
-    return [topLeftResult,topRightResult,bottomRightResult,bottomLeftResult];
+    let sorted = [topLeftResult,topRightResult,bottomRightResult,bottomLeftResult];
+    console.log(sorted);
+    return sorted;
   }
 
   function getPointsFromBarcodeResults(barcodeResults){
     let points = [];
-    let point1 = {x:barcodeResults[0].location.points[2].x,y:barcodeResults[0].location.points[2].y};
-    let point2 = {x:barcodeResults[1].location.points[3].x,y:barcodeResults[1].location.points[3].y};
-    let point3 = {x:barcodeResults[2].location.points[0].x,y:barcodeResults[2].location.points[0].y};
-    let point4 = {x:barcodeResults[3].location.points[1].x,y:barcodeResults[3].location.points[1].y};
+    let point1 = getBottomRightPoint(barcodeResults[0].location.points);
+    let point2 = getBottomLeftPoint(barcodeResults[1].location.points);
+    let point3 = getTopLeftPoint(barcodeResults[2].location.points);
+    let point4 = getTopRightPoint(barcodeResults[3].location.points);
     return [point1,point2,point3,point4];
+  }
+
+  function getTopLeftPoint(points){
+    let x = points[0].x;
+    let y = points[0].y;
+    for (let index = 0; index < points.length; index++) {
+      const point = points[index];
+      x = Math.min(point.x, x);
+      y = Math.min(point.y, y);
+    }
+    return {x:x,y:y};
+  }
+
+  function getTopRightPoint(points){
+    let x = 0;
+    let y = points[0].y;
+    for (let index = 0; index < points.length; index++) {
+      const point = points[index];
+      x = Math.max(point.x, x);
+      y = Math.min(point.y, y);
+    }
+    return {x:x,y:y};
+  }
+
+  function getBottomRightPoint(points){
+    let x = 0;
+    let y = 0;
+    for (let index = 0; index < points.length; index++) {
+      const point = points[index];
+      x = Math.max(point.x, x);
+      y = Math.max(point.y, y);
+    }
+    return {x:x,y:y};
+  }
+
+  function getBottomLeftPoint(points){
+    let x = points[0].x;
+    let y = 0;
+    for (let index = 0; index < points.length; index++) {
+      const point = points[index];
+      x = Math.min(point.x, x);
+      y = Math.max(point.y, y);
+    }
+    return {x:x,y:y};
   }
 
   async function updateTargetROI(){
