@@ -1,8 +1,10 @@
-import { Image, StyleSheet, Text, Button, View, BackHandler } from 'react-native';
+import { Image, StyleSheet, Text, Button, View, BackHandler, Pressable } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useEffect, useState } from 'react';
 import DocumentScanner from '@/components/Scanner';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 
 export default function HomeScreen() {
   const [isScanning,setIsScanning] = useState(false);
@@ -27,6 +29,17 @@ export default function HomeScreen() {
   const onScanned = (dataURL:string) => {
     console.log(dataURL.substring(0,100));
     setImageDataURL(dataURL);
+  }
+  const shareImage = async () => {
+    const path= FileSystem.documentDirectory + "scanned.png";
+    const base64Code = removeDataURLHead(imageDataURL);
+    await FileSystem.writeAsStringAsync(path, base64Code, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    Sharing.shareAsync(path);
+  }
+  const removeDataURLHead = (dataURL:string) => {
+    return dataURL.substring(dataURL.indexOf(",")+1,dataURL.length);
   }
   return (
     <>
@@ -53,10 +66,15 @@ export default function HomeScreen() {
             setIsScanning(true);
           }}></Button>
           {imageDataURL && (
-            <Image
-              source={{uri:imageDataURL}}
-              style={styles.scanned}
-            />  
+            <Pressable
+              onPress={()=>{shareImage();}}
+            >
+              <Image
+                source={{uri:imageDataURL}}
+                style={styles.scanned}
+              />  
+            </Pressable>
+            
           )}
         </ParallaxScrollView>
       )}
