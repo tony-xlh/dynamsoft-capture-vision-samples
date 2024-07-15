@@ -2,6 +2,7 @@
   "CaptureVisionTemplates": [
     {
       "Name": "ScanCornerQRCodes",
+      "OutputOriginalImage":1,
       "ImageROIProcessingNameArray": [
         "full-image"
       ]
