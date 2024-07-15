@@ -59,7 +59,7 @@ export default function HomeScreen() {
               style={styles.reactLogo}
             />
           }>
-          <View>
+          <View style={styles.centered}>
             <Text>Smart Note Scanner</Text>
           </View>
           <Button title="Start Scanning" onPress={()=>{
@@ -85,6 +85,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    alignItems:"center"
   },
   reactLogo: {
     height: 178,
