@@ -84,8 +84,12 @@
     let normalized = result.normalizedImageResultItems[0];
     console.log(normalized)
     let img = document.createElement("img");
-    img.src = normalized.toCanvas().toDataURL();
+    let dataURL = normalized.toCanvas().toDataURL();
+    img.src = dataURL;
     document.body.append(img);
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(dataURL);
+    }
   }
 
   function sortedResults(results,centerX,centerY){
@@ -206,6 +210,9 @@
     document.getElementsByClassName("scanner")[0].style.display = "none";
     await cvRouter.stopCapturing();
     await cameraEnhancer.close();
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage("");
+    }
   }
 </script>
 </body>
