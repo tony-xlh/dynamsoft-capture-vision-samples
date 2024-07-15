@@ -24,14 +24,17 @@ export default function HomeScreen() {
       return false;
     });
   }, []);
-  
+  const onScanned = (dataURL:string) => {
+    console.log(dataURL.substring(0,100));
+    setImageDataURL(dataURL);
+  }
   return (
     <>
       {isScanning && (
         <DocumentScanner
           license="DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAwMjI3NzYzLVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21sdHMuZHluYW1zb2Z0LmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAwMjI3NzYzIiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2x0cy5keW5hbXNvZnQuY29tIiwiY2hlY2tDb2RlIjotMzg1NjA5MTcyfQ=="
           onClosed={()=>{setIsScanning(false)}}
-          onScanned={(dataURL:string)=>{setImageDataURL(dataURL)}}
+          onScanned={(dataURL:string)=>{onScanned(dataURL);}}
         ></DocumentScanner>
       )}
       {!isScanning && (
@@ -73,7 +76,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   scanned:{
-    width: "100%",
+    height: 200,
+    width: '100%',
     resizeMode: "contain"
   }
 });
