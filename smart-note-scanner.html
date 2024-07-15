@@ -144,13 +144,18 @@
     let settings = JSON.parse(settingsStr);
     let width = cameraEnhancer.getResolution().width;
     let height = cameraEnhancer.getResolution().height;
+    console.log("update target roi");
+    console.log(width);
+    console.log(height);
     let ROIs = [];
     let ROINames = [];
-    let topLeftRegion = {left:0,top:0,width:width*0.3,height:width*0.3};
-    let topRightRegion = {left:width*0.7,top:0,width:width*0.3,height:width*0.3};
-    let bottomRightRegion = {left:width*0.7,top:height - width*0.3,width:width*0.3,height:width*0.3};
-    let bottomLeftRegion = {left:0,top:height - width*0.3,width:width*0.3,height:width*0.3};
+    let regionSize = Math.floor(width*0.3);
+    let topLeftRegion = {left:0,top:0,width:regionSize,height:regionSize};
+    let topRightRegion = {left:width - regionSize,top:0,width:regionSize,height:regionSize};
+    let bottomRightRegion = {left:width - regionSize,top:height - regionSize,width:regionSize,height:regionSize};
+    let bottomLeftRegion = {left:0,top:height - regionSize,width:regionSize,height:regionSize};
     let regions = [topLeftRegion,topRightRegion,bottomRightRegion,bottomLeftRegion];
+    console.log(regions);
     for (let index = 0; index < regions.length; index++) {
       const region = regions[index];
       let roi = {
