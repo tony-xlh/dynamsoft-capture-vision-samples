@@ -173,10 +173,10 @@
     let bigRegionWidth = 0.8*width;
     let left = Math.floor(0.01*width);
     let top = Math.floor(0.1*height);
-    let desiredBigRegionHeight = bigRegionWidth/(140/210);
+    let desiredBigRegionHeight = Math.floor(bigRegionWidth/(140/210));
     if (width>height) {
       top = Math.floor(0.01*height);
-      desiredBigRegionHeight = bigRegionWidth/(210/140)
+      desiredBigRegionHeight = Math.floor(bigRegionWidth/(210/140));
     }
     let regionSize = Math.floor(bigRegionWidth*0.3);
     
