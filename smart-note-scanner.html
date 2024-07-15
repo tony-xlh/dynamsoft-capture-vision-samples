@@ -159,11 +159,20 @@
     console.log(height);
     let ROIs = [];
     let ROINames = [];
-    let regionSize = Math.floor(width*0.3);
-    let topLeftRegion = {left:0,top:0,width:regionSize,height:regionSize};
-    let topRightRegion = {left:width - regionSize,top:0,width:regionSize,height:regionSize};
-    let bottomRightRegion = {left:width - regionSize,top:height - regionSize,width:regionSize,height:regionSize};
-    let bottomLeftRegion = {left:0,top:height - regionSize,width:regionSize,height:regionSize};
+    //A5: 140x210mm
+
+    let bigRegionWidth = 0.8*width;
+    let desiredBigRegionHeight = bigRegionWidth/(140/210);
+    if (width>height) {
+      desiredBigRegionHeight = bigRegionWidth/(210/140)
+    }
+    let regionSize = Math.floor(bigRegionWidth*0.3);
+    let left = Math.floor(0.01*width);
+    let top = Math.floor(0.01*height);
+    let topLeftRegion = {left:left,top:top,width:regionSize,height:regionSize};
+    let topRightRegion = {left:width - regionSize - left,top:top,width:regionSize,height:regionSize};
+    let bottomRightRegion = {left:width - regionSize - left,top: top + desiredBigRegionHeight - regionSize,width:regionSize,height:regionSize};
+    let bottomLeftRegion = {left:left,top:top + desiredBigRegionHeight - regionSize,width:regionSize,height:regionSize};
     let regions = [topLeftRegion,topRightRegion,bottomRightRegion,bottomLeftRegion];
     console.log(regions);
     for (let index = 0; index < regions.length; index++) {
