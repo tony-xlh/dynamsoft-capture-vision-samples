@@ -9,6 +9,7 @@
       top: 0;
       width: 100%;
       height: 100%;
+      background: white;
     }
     .closeButton {
       position: fixed;
@@ -31,7 +32,19 @@
   <button class="startButton" onclick="startScanning()">Start Scanning</button>
   <div class="scanner" style="display:none;">
     <button class="closeButton" onclick="stopScanning()">Close</button>
-    <div id="cameraView"></div>
+    <div id="cameraView">
+      <div class="dce-video-container" style="width:100%;height:100%;"></div>
+      <div style="position:absolute;left:0;top:0;">
+        <select class="dce-sel-camera"></select>
+        <select class="dce-sel-resolution">
+          <option class="dce-opt-gotResolution" value="got"></option>
+          <option data-width="3840" data-height="2160">3840x2160</option>
+          <option data-width="1920" data-height="1080">1920x1080</option>
+          <option data-width="1280" data-height="720">1280x720</option>
+          <option data-width="640" data-height="480">640x480</option>
+        </select>
+      </div>
+    </div>
   </div>
 <script>
   let cvRouter;
@@ -51,12 +64,11 @@
     Dynamsoft.Core.CoreModule.loadWasm(["dbr"]);
     cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
 
-    cameraView = await Dynamsoft.DCE.CameraView.createInstance();
+    cameraView = await Dynamsoft.DCE.CameraView.createInstance(document.getElementById("cameraView"));
     cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
     cameraEnhancer.on("resolutionChange", (resolution, previousResolution) => {
       updateTargetROI();
     });
-    document.querySelector("#cameraView").append(cameraView.getUIElement());
     cvRouter.setInput(cameraEnhancer);
     let response = await fetch("./cornerQRCodes.json");
     settingsStr = await response.text();
